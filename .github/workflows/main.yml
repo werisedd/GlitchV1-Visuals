@@ -1,29 +1,31 @@
 name: Build GlitchV1
-
 on:
   workflow_dispatch:
   push:
     branches: [ "main" ]
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-
+        uses: actions/checkout@v4
       - name: Set up JDK 8
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '8'
           distribution: 'temurin'
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
+      - name: Download Wrapper
+        run: |
+          rm -f gradlew gradlew.bat
+          rm -rf gradle/wrapper
+          mkdir -p gradle/wrapper
+          curl -L https://github.com/FabricMC/fabric-example-mod/raw/master/gradle/wrapper/gradle-wrapper.jar -o gradle/wrapper/gradle-wrapper.jar
+          curl -L https://raw.githubusercontent.com/FabricMC/fabric-example-mod/master/gradle/wrapper/gradle-wrapper.properties -o gradle/wrapper/gradle-wrapper.properties
+          curl -L https://raw.githubusercontent.com/FabricMC/fabric-example-mod/master/gradlew -o gradlew
+          curl -L https://raw.githubusercontent.com/FabricMC/fabric-example-mod/master/gradlew.bat -o gradlew.bat
+          chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build
-
       - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
